@@ -5,13 +5,17 @@ package NLP::StanfordParser;
 
 use 5.010000;
 use feature ':5.10';
-use strict;
-use warnings;
+use common::sense;
 use Carp;
 
 BEGIN {
-    $NLP::StanfordParser::VERSION = '0.02';
-    croak "You need to set NLPSTANFORD environment variable to run this" unless defined $ENV{NLPSTANFORD};
+    $NLP::StanfordParser::VERSION = '0.01';
+
+    # extract the path from the Package
+    my $package = __PACKAGE__;
+    $package =~ s/::/\//g;
+    our $JarPath = $INC{"$package.pm"};
+    $JarPath =~ s/\.pm$//g;
 }
 use Inline (
     Java => << 'END_OF_JAVA_CODE',
@@ -19,11 +23,11 @@ use Inline (
 	import edu.stanford.nlp.trees.*;
 	import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 
-	class JavaStanfordParser {
+	class Java {
 		LexicalizedParser parser;
 		TreebankLanguagePack tlp;
 		GrammaticalStructureFactory gsf;
-		public JavaStanfordParser (String model) {
+		public Java (String model) {
 			parser = new LexicalizedParser(model);
 			parser.setOptionFlags("-retainTmpSubcategories");
 			tlp = new PennTreebankLanguagePack();
@@ -43,7 +47,7 @@ use Inline (
 		}
 	}
 END_OF_JAVA_CODE
-    CLASSPATH       => "$ENV{NLPSTANFORD}/stanford-parser.jar",
+    CLASSPATH       => "$NLP::StanfordParser::JarPath/stanford-parser.jar",
     EXTRA_JAVA_ARGS => '-Xmx800m'
 );
 use Moose;
@@ -52,14 +56,13 @@ use namespace::autoclean;
 has model => (
     is      => 'ro',
     isa     => 'Str',
-    default => "$ENV{NLPSTANFORD}/englishPCFG.ser.gz"
+    default => "$NLP::StanfordParser::JarPath/englishPCFG.ser.gz"
 );
 has parser => ( is => 'ro', lazy_build => 1, handles => [qw/parse/] );
 
 sub _build_parser {
     my $self = shift;
-    return new NLP::StanfordParser::JavaStanfordParser(
-        $self->model );
+    return new NLP::StanfordParser::Java( $self->model );
 }
 
 __PACKAGE__->meta->make_immutable;
