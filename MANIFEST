@@ -1,8 +1,14 @@
 Build.PL
+data/stanford-parser-2010-11-30/englishFactored.ser.gz
+data/stanford-parser-2010-11-30/englishPCFG.ser.gz
+data/stanford-parser-2010-11-30/stanford-parser.jar
+data/stanford-parser-2010-11-30/wsjFactored.ser.gz
+data/stanford-parser-2010-11-30/wsjPCFG.ser.gz
 lib/NLP/Service.pm
 lib/NLP/StanfordParser.pm
+LICENSE
 MANIFEST			This list of files
+META.yml
+script/app.pl
 t/00nlpstanford.t
 t/01service.t
-LICENSE
-META.yml

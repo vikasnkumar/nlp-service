@@ -15,19 +15,26 @@ BEGIN {
     $package =~ s/::/\//g;
     our $JarPath = $INC{$package};
     $JarPath =~ s/\.pm$//g;
+    our $JarVersion = '2010-11-30';
 }
 use constant {
     MODEL_EN_FACTORED => "$NLP::StanfordParser::JarPath/englishFactored.ser.gz",
     MODEL_EN_PCFG     => "$NLP::StanfordParser::JarPath/englishPCFG.ser.gz",
-    MODEL_WSJ_FACTORED => "$NLP::StanfordParser::JarPath/wsjFactored.ser.gz",
-    MODEL_WSJ_PCFG     => "$NLP::StanfordParser::JarPath/wsjPCFG.ser.gz",
-    PARSER_JAR         => "$NLP::StanfordParser::JarPath/stanford-parser.jar",
+    MODEL_WSJ_FACTORED  => "$NLP::StanfordParser::JarPath/wsjFactored.ser.gz",
+    MODEL_WSJ_PCFG      => "$NLP::StanfordParser::JarPath/wsjPCFG.ser.gz",
+    PARSER_JAR          => "$NLP::StanfordParser::JarPath/stanford-parser.jar",
+    PARSER_RELEASE_DATE => "$NLP::StanfordParser::JarVersion",
+    PARSER_SOURCE_URI   => 'http://nlp.stanford.edu/software/stanford-parser-'
+      . "$NLP::StanfordParser::JarVersion.tgz",
 };
 our @EXPORT = qw(
   MODEL_EN_FACTORED
   MODEL_EN_PCFG
   MODEL_WSJ_FACTORED
   MODEL_WSJ_PCFG
+  PARSER_JAR
+  PARSER_RELEASE_DATE
+  PARSER_SOURCE_URI
 );
 use Inline (
     Java => << 'END_OF_JAVA_CODE',
@@ -110,24 +117,37 @@ NLP::StanfordParser
 NLP::StanfordParser is a Java wrapper around Stanford's NLP libraries and data
 files.
 
-=head1 COPYRIGHT
-
-Vikas Naresh Kumar <vikas@cpan.org>
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-Started on 6th March 2011.
-
 =head1 EXPORTED CONSTANTS
 
 =over
 
 =item MODEL_EN_PCFG
 
+The full path of the 'English PCFG' model data.
+
 =item MODEL_EN_FACTORED
+
+The full path of the 'English Factored' model data.
 
 =item MODEL_WSJ_PCFG
 
+The full path of the 'WSJ PCFG' model data.
+
 =item MODEL_WSJ_FACTORED
+
+The full path of the 'WSJ Factored' model data.
+
+=item PARSER_JAR
+
+The full path of the JAR file that is used by this module.
+
+=item PARSER_RELEASE_DATE
+
+The date of the release of the Stanford Parser.
+
+=item PARSER_SOURCE_URI
+
+URL for downloading the full package from if the user feels like.
 
 =back 
 
@@ -135,20 +155,35 @@ Started on 6th March 2011.
 
 =over
 
-=item model
+=item B<model>
 
 The model can be of 4 types as per the MODEL_* constants described above.
 The default model is MODEL_EN_PCFG.
 
-=item parser()
+=item B<parser>
 
+The actual parser object. This has a few methods that are exposed externally to
+the actual class, most notably the I<parse()> method.
 
 =back
 
-=head1 RESTful API
+=head1 OBJECT METHODS
 
 =over
 
-=item GET /nlp/models 
+=item B<parse()> 
+
+The method that invokes the current parser object and parses the input array of
+strings and returns the parsed output as a string as well.
 
 =back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011. B<Vikas Naresh Kumar> <vikas@cpan.org>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Started on 6th March 2011.
+

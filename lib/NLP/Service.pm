@@ -54,18 +54,11 @@ NLP::Service
 
 NLP::Service is a RESTful web service based off Dancer to provide natural language parsing for English.
 
-=head1 COPYRIGHT
-
-Vikas Naresh Kumar. <vikas@cpan.org>
-Started on 25th March 2011.
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =head1 METHODS
 
 =over
 
-=item run()
+=item B<run()>
 
 The run() function starts up the NLP::Service, and listens to requests. It currently takes no parameters.
 It makes sure that the NLP Engines that are being used are loaded up before the web service is ready.
@@ -79,3 +72,13 @@ It makes sure that the NLP Engines that are being used are loaded up before the 
 =item GET /nlp/models 
 
 =back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011. B<Vikas Naresh Kumar> <vikas@cpan.org>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Started on 25th March 2011.
+

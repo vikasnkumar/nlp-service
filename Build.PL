@@ -2,11 +2,7 @@ use strict;
 use warnings;
 use Module::Build;
 
-#TODO: use better checks for the Java stuff being installed.
-#use LWP to download and untar the stanford parser
-my $nlppath = $ENV{NLPSTANFORD}
-  or die "Please set the NLPSTANFORD environment variable to point "
-  . "the Stanford NLP distribution";
+my $nlppath = defined $ENV{NLPSTANFORD} ? $ENV{NLPSTANFORD} : 'data/stanford-parser-2010-11-30';
 print "Using datafiles and jar files from $nlppath\n";
 my @nlpfiles = qw(
   stanford-parser.jar

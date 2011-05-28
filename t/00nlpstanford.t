@@ -2,11 +2,10 @@ use Test::More;
 use Test::Moose;
 
 BEGIN {
-    plan skip_all => 'Environment variable NLPSTANFORD should be defined '
-      . 'to the directory where the Java libraries reside.'
-      unless defined $ENV{NLPSTANFORD};
     use_ok('NLP::StanfordParser');
 }
+
+is(PARSER_RELEASE_DATE, '2010-11-30', 'The parser is of the right release date');
 
 subtest 'model is PCFG' => sub {
     my $nlp = new_ok('NLP::StanfordParser');
