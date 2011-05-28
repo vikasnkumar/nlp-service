@@ -4,3 +4,5 @@ lib/NLP/StanfordParser.pm
 MANIFEST			This list of files
 t/00nlpstanford.t
 t/01service.t
+LICENSE
+META.yml

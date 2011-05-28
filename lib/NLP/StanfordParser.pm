@@ -1,6 +1,3 @@
-### COPYRIGHT: Selective Intellect LLC
-### AUTHOR: Vikas N Kumar
-### DATE: 8th March 2011
 package NLP::StanfordParser;
 
 use 5.010000;
@@ -10,8 +7,9 @@ use Carp;
 
 BEGIN {
     use Exporter();
-    our @ISA = qw(Exporter);
+    our @ISA     = qw(Exporter);
     our $VERSION = '0.01';
+
     # extract the path from the Package
     my $package = __PACKAGE__ . '.pm';
     $package =~ s/::/\//g;
@@ -19,11 +17,18 @@ BEGIN {
     $JarPath =~ s/\.pm$//g;
 }
 use constant {
-    MODEL_FACTORED => "$NLP::StanfordParser::JarPath/englishFactored.ser.gz",
-    MODEL_PCFG => "$NLP::StanfordParser::JarPath/englishPCFG.ser.gz",
-    PARSER_JAR => "$NLP::StanfordParser::JarPath/stanford-parser.jar",
+    MODEL_EN_FACTORED => "$NLP::StanfordParser::JarPath/englishFactored.ser.gz",
+    MODEL_EN_PCFG     => "$NLP::StanfordParser::JarPath/englishPCFG.ser.gz",
+    MODEL_WSJ_FACTORED => "$NLP::StanfordParser::JarPath/wsjFactored.ser.gz",
+    MODEL_WSJ_PCFG     => "$NLP::StanfordParser::JarPath/wsjPCFG.ser.gz",
+    PARSER_JAR         => "$NLP::StanfordParser::JarPath/stanford-parser.jar",
 };
-our @EXPORT = qw(MODEL_FACTORED MODEL_PCFG);
+our @EXPORT = qw(
+  MODEL_EN_FACTORED
+  MODEL_EN_PCFG
+  MODEL_WSJ_FACTORED
+  MODEL_WSJ_PCFG
+);
 use Inline (
     Java => << 'END_OF_JAVA_CODE',
 	import java.util.*;
@@ -55,7 +60,7 @@ use Inline (
 	}
 END_OF_JAVA_CODE
     CLASSPATH       => PARSER_JAR,
-    EXTRA_JAVA_ARGS => '-Xmx800m'
+    EXTRA_JAVA_ARGS => '-Xmx800m',
 );
 use Moose;
 use namespace::autoclean;
@@ -63,11 +68,14 @@ use namespace::autoclean;
 has model => (
     is      => 'ro',
     isa     => 'Str',
-    default => MODEL_PCFG,
+    default => MODEL_EN_PCFG,
 );
 
-has parser => ( is => 'ro', lazy_build => 1, handles => [qw/parse/],
-    isa => 'NLP::StanfordParser::Java',
+has parser => (
+    is         => 'ro',
+    lazy_build => 1,
+    handles    => [qw/parse/],
+    isa        => 'NLP::StanfordParser::Java',
 );
 
 sub _build_parser {
@@ -76,19 +84,71 @@ sub _build_parser {
 }
 
 before '_build_parser' => sub {
-    croak 'Unable to find ' . PARSER_JAR unless -e PARSER_JAR;
-    croak 'Unable to find ' . MODEL_PCFG unless -e MODEL_PCFG;
-    croak 'Unable to find ' . MODEL_FACTORED unless -e MODEL_FACTORED;
+    croak 'Unable to find ' . PARSER_JAR        unless -e PARSER_JAR;
+    croak 'Unable to find ' . MODEL_EN_PCFG     unless -e MODEL_EN_PCFG;
+    carp 'Unable to find ' . MODEL_EN_FACTORED  unless -e MODEL_EN_FACTORED;
+    carp 'Unable to find ' . MODEL_WSJ_PCFG     unless -e MODEL_WSJ_PCFG;
+    carp 'Unable to find ' . MODEL_WSJ_FACTORED unless -e MODEL_WSJ_FACTORED;
 };
 
 __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
-#####################################################################
-# This loads the stanford NLP Parser into Perl.
-# should really be loaded only once per model.
-#
-### COPYRIGHT: Selective Intellect LLC
-### AUTHOR: Vikas N Kumar
-### DATE: 6th March 2011
+COPYRIGHT: 2011. Vikas Naresh Kumar.
+AUTHOR: Vikas Naresh Kumar
+DATE: 6th March 2011
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 NAME
+
+NLP::StanfordParser
+
+=head1 SYNOPSIS
+
+NLP::StanfordParser is a Java wrapper around Stanford's NLP libraries and data
+files.
+
+=head1 COPYRIGHT
+
+Vikas Naresh Kumar <vikas@cpan.org>
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+Started on 6th March 2011.
+
+=head1 EXPORTED CONSTANTS
+
+=over
+
+=item MODEL_EN_PCFG
+
+=item MODEL_EN_FACTORED
+
+=item MODEL_WSJ_PCFG
+
+=item MODEL_WSJ_FACTORED
+
+=back 
+
+=head1 OBJECT ATTRIBUTES
+
+=over
+
+=item model
+
+The model can be of 4 types as per the MODEL_* constants described above.
+The default model is MODEL_EN_PCFG.
+
+=item parser()
+
+
+=back
+
+=head1 RESTful API
+
+=over
+
+=item GET /nlp/models 
+
+=back

@@ -1,6 +1,3 @@
-### COPYRIGHT: Selective Intellect LLC
-### AUTHOR: Vikas N Kumar
-### DATE: 25th March 2011
 package NLP::Service;
 
 use 5.010000;
@@ -10,7 +7,7 @@ use Carp;
 
 BEGIN {
     use Exporter();
-    our @ISA = qw(Exporter);
+    our @ISA     = qw(Exporter);
     our $VERSION = '0.01';
 }
 
@@ -18,37 +15,36 @@ use Dancer;
 use Dancer::Plugin::REST;
 use NLP::StanfordParser;
 
-our $timer;
+my %_nlp = ();
 
 set serializer => 'YAML';
 
 get '/nlp/:name' => sub {
-    return { name => params->{name}};
+    return { name => params->{name} };
 };
 
 sub run {
-    $_nlp{pcfg} = new NLP::StanfordParser(model => MODEL_PCFG) or
-                  croak 'Unable to create MODEL_PCFG for NLP::StanfordParser';
+    $_nlp{en_pcfg} = new NLP::StanfordParser( model => MODEL_EN_PCFG )
+      or croak 'Unable to create MODEL_EN_PCFG for NLP::StanfordParser';
+
     # PCFG load times are reasonable ~ 5 sec. We force load on startup.
-    $_nlp{pcfg}->parser;
-    $_nlp{factored} = new NLP::StanfordParser(model => MODEL_FACTORED) or
-                  croak 'Unable to create MODEL_FACTORED for NLP::StanfordParser';
+    $_nlp{en_pcfg}->parser;
+    $_nlp{en_factored} = new NLP::StanfordParser( model => MODEL_EN_FACTORED )
+      or croak 'Unable to create MODEL_EN_FACTORED for NLP::StanfordParser';
+
     # Factored load times can be quite slow ~ 30 sec. We force load on startup.
-     $_nlp{factored}->parser;
+    $_nlp{en_factored}->parser;
 
     dance;
 }
 
 1;
 __END__
-#####################################################################
-# This creates a RESTful service around the StanfordParser.
-#
-### COPYRIGHT: Selective Intellect LLC
-### AUTHOR: Vikas N Kumar
-### DATE: 25th March 2011
-#
-#
+COPYRIGHT: 2011. Vikas Naresh Kumar.
+AUTHOR: Vikas Naresh Kumar
+DATE: 25th March 2011
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 NAME
 
@@ -60,7 +56,10 @@ NLP::Service is a RESTful web service based off Dancer to provide natural langua
 
 =head1 COPYRIGHT
 
-Vikas Naresh Kumar, Selective Intellect LLC. All Rights Reserved.
+Vikas Naresh Kumar. <vikas@cpan.org>
+Started on 25th March 2011.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 METHODS
 
@@ -80,7 +79,3 @@ It makes sure that the NLP Engines that are being used are loaded up before the 
 =item GET /nlp/models 
 
 =back
-
-
-
-
