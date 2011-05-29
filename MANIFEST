@@ -9,6 +9,7 @@ lib/NLP/StanfordParser.pm
 LICENSE
 MANIFEST			This list of files
 META.yml
+README
 script/nlpservice
 t/00nlpstanford.t
 t/01service.t

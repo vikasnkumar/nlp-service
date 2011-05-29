@@ -20,6 +20,7 @@ my $build = Module::Build->new(
     dist_abstract  => 'A RESTful NLP Service',
     license        => 'perl',
     create_license => 1,
+    create_readme  => 1,
     requires       => {
         'perl'                 => '5.10.0',
         'common::sense'        => 0,
