@@ -74,5 +74,6 @@
 ^TODO$
 ^todo$
 \b_Inline.*
+\blogs
 # Avoid archives of this distribution
 \bNLP-StanfordParser-[\d\.\_]+

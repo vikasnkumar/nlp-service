@@ -3,7 +3,7 @@ package NLP::StanfordParser;
 use 5.010000;
 use feature ':5.10';
 use common::sense;
-use Carp;
+use Carp ();
 
 BEGIN {
     use Exporter();
@@ -91,11 +91,11 @@ sub _build_parser {
 }
 
 before '_build_parser' => sub {
-    croak 'Unable to find ' . PARSER_JAR       unless -e PARSER_JAR;
-    croak 'Unable to find ' . MODEL_EN_PCFG    unless -e MODEL_EN_PCFG;
-    carp 'Unable to find ' . MODEL_EN_FACTORED unless -e MODEL_EN_FACTORED;
-    carp 'Unable to find ' . MODEL_EN_PCFG_WSJ unless -e MODEL_EN_PCFG_WSJ;
-    carp 'Unable to find ' . MODEL_EN_FACTORED_WSJ
+    Carp::croak 'Unable to find ' . PARSER_JAR       unless -e PARSER_JAR;
+    Carp::croak 'Unable to find ' . MODEL_EN_PCFG    unless -e MODEL_EN_PCFG;
+    Carp::carp 'Unable to find ' . MODEL_EN_FACTORED unless -e MODEL_EN_FACTORED;
+    Carp::carp 'Unable to find ' . MODEL_EN_PCFG_WSJ unless -e MODEL_EN_PCFG_WSJ;
+    Carp::carp 'Unable to find ' . MODEL_EN_FACTORED_WSJ
       unless -e MODEL_EN_FACTORED_WSJ;
 };
 

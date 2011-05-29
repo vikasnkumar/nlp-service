@@ -35,15 +35,16 @@ my $build = Module::Build->new(
         'Test::Moose' => 0,
         'Dancer::Test' => 0,
     },
-    script_files => qw( script/app.pl ),
+    script_files => qw( script/nlpservice ),
     install_path => { java => 'lib/NLP/StanfordParser/', },
     java_files   => \%nlpjava,
 );
 $build->add_build_element('java');
-$build->add_to_cleanup(qw/_Inline/);
+$build->add_to_cleanup(qw/_Inline *.bak/);
 $build->create_build_script;
 $build->dispatch('clean');
 $build->dispatch('distmeta');
+$build->dispatch('manifest');
 $build->dispatch('build');
 __END__
 COPYRIGHT: 2011. Vikas Naresh Kumar.

@@ -3,7 +3,7 @@ package NLP::Service;
 use 5.010000;
 use feature ':5.10';
 use common::sense;
-use Carp;
+use Carp ();
 
 BEGIN {
     use Exporter();
@@ -11,13 +11,18 @@ BEGIN {
     our $VERSION = '0.01';
 }
 
-use Dancer qw(get post dance);
+use Dancer qw(:tests); # we do not want the tests exporting the wrong functions.
 use Dancer::Plugin::REST;
 use NLP::StanfordParser;
 
 my %_nlp = ();
 
 prepare_serializer_for_format;
+
+get '/' => sub {
+    #TODO: show a UI form based thing for easy use for the end user.
+    return 'This is ' . config->{appname} . "\n";
+};
 
 get '/nlp/models.:format' => sub {
     return [ keys %_nlp ];
@@ -28,36 +33,51 @@ get '/nlp/languages.:format' => sub {
 };
 
 get '/nlp/info.:format' => sub {
-    my %hh = ();
-    $hh{version}        = $NLP::Service::VERSION;
-    $hh{nlplib_name}    = 'Stanford Parser';
-    $hh{nlplib_source}  = PARSER_SOURCE_URI;
-    $hh{nlplib_release} = PARSER_RELEASE_DATE;
-    return \%hh;
+    return {
+        version        => $NLP::Service::VERSION,
+        nlplib_name    => 'Stanford Parser',
+        nlplib_source  => PARSER_SOURCE_URI,
+        nlplib_release => PARSER_RELEASE_DATE,
+    };
+};
+
+any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
+    my $model = params->{model};
+    return send_error({ error => "Unknown parsing model $model"} , 500) unless defined $_nlp{model};
+    my $txt = params->{text};
+    return send_error({ error => "Empty 'text' parameter" }, 500)  unless defined $txt;
+    return $_nlp{$model}->parse($txt) . "\n";
 };
 
 sub run {
     my %args = @_;
     my $force = $args{force} if scalar( keys(%args) );
+   
+    #TODO: should be able to take a YAML file that can convert to a
+    #Dancer::Config object and use that. should also add logging statements.
+    set log => 'debug';
+    set logger => 'console';
+    set show_errors => 1;
+   
     say 'Forcing loading of all NLP models.' if $force;
     $_nlp{en_pcfg} = new NLP::StanfordParser( model => MODEL_EN_PCFG )
-      or croak 'Unable to create MODEL_EN_PCFG for NLP::StanfordParser';
+      or Carp::croak 'Unable to create MODEL_EN_PCFG for NLP::StanfordParser';
 
     # PCFG load times are reasonable ~ 5 sec. We force load on startup.
     $_nlp{en_pcfg}->parser if $force;
     $_nlp{en_factored} = new NLP::StanfordParser( model => MODEL_EN_FACTORED )
-      or croak 'Unable to create MODEL_EN_FACTORED for NLP::StanfordParser';
+      or Carp::croak 'Unable to create MODEL_EN_FACTORED for NLP::StanfordParser';
 
     # Factored load times can be quite slow ~ 30 sec. We force load on startup.
     $_nlp{en_factored}->parser if $force;
 
     # PCFG WSJ takes ~ 2-3 seconds to load
     $_nlp{en_pcfgwsj} = new NLP::StanfordParser( model => MODEL_EN_PCFG_WSJ )
-      or croak 'Unable to create MODEL_EN_PCFG_WSJ for NLP::StanfordParser';
+      or Carp::croak 'Unable to create MODEL_EN_PCFG_WSJ for NLP::StanfordParser';
     $_nlp{en_pcfgwsj}->parser if $force;
     $_nlp{en_factoredwsj} =
          new NLP::StanfordParser( model => MODEL_EN_FACTORED_WSJ )
-      or croak 'Unable to create MODEL_EN_FACTORED_WSJ for NLP::StanfordParser';
+      or Carp::croak 'Unable to create MODEL_EN_FACTORED_WSJ for NLP::StanfordParser';
 
     # FACTORED WSJ takes ~ 20 seconds to load
     $_nlp{en_factoredwsj}->parser if $force;
@@ -100,8 +120,8 @@ C<NLP::Service::run(load =E<gt> 1)>
 
 =head1 RESTful API
 
-Multiple formats are supported in the API. Most notably they are YAML and JSON.
-The URIs need to end with C<.yml> and C<.json> for YAML and JSON, respectively.
+Multiple formats are supported in the API. Most notably they are XML, YAML and JSON.
+The URIs need to end with C<.xml>, C<.yml> and C<.json> for XML, YAML and JSON, respectively.
 
 =over
 

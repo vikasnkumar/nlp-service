@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use common::sense;
+use NLP::Service;
+
+NLP::Service::run();
+__END__
+
+=head1 NAME
+
+nlpservice
+
+=head1 SYNOPSIS
+
+Runs a barebones NLP::Service application. Takes in command line arguments for
+configuration.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011. B<Vikas Naresh Kumar> <vikas@cpan.org>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Started on 28th March 2011.
+
