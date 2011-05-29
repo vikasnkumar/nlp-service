@@ -12,3 +12,4 @@ META.yml
 script/app.pl
 t/00nlpstanford.t
 t/01service.t
+t/02rest.t
