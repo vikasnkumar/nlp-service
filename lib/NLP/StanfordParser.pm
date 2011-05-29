@@ -20,8 +20,8 @@ BEGIN {
 use constant {
     MODEL_EN_FACTORED => "$NLP::StanfordParser::JarPath/englishFactored.ser.gz",
     MODEL_EN_PCFG     => "$NLP::StanfordParser::JarPath/englishPCFG.ser.gz",
-    MODEL_WSJ_FACTORED  => "$NLP::StanfordParser::JarPath/wsjFactored.ser.gz",
-    MODEL_WSJ_PCFG      => "$NLP::StanfordParser::JarPath/wsjPCFG.ser.gz",
+    MODEL_EN_FACTORED_WSJ => "$NLP::StanfordParser::JarPath/wsjFactored.ser.gz",
+    MODEL_EN_PCFG_WSJ     => "$NLP::StanfordParser::JarPath/wsjPCFG.ser.gz",
     PARSER_JAR          => "$NLP::StanfordParser::JarPath/stanford-parser.jar",
     PARSER_RELEASE_DATE => "$NLP::StanfordParser::JarVersion",
     PARSER_SOURCE_URI   => 'http://nlp.stanford.edu/software/stanford-parser-'
@@ -30,8 +30,8 @@ use constant {
 our @EXPORT = qw(
   MODEL_EN_FACTORED
   MODEL_EN_PCFG
-  MODEL_WSJ_FACTORED
-  MODEL_WSJ_PCFG
+  MODEL_EN_FACTORED_WSJ
+  MODEL_EN_PCFG_WSJ
   PARSER_JAR
   PARSER_RELEASE_DATE
   PARSER_SOURCE_URI
@@ -91,11 +91,12 @@ sub _build_parser {
 }
 
 before '_build_parser' => sub {
-    croak 'Unable to find ' . PARSER_JAR        unless -e PARSER_JAR;
-    croak 'Unable to find ' . MODEL_EN_PCFG     unless -e MODEL_EN_PCFG;
-    carp 'Unable to find ' . MODEL_EN_FACTORED  unless -e MODEL_EN_FACTORED;
-    carp 'Unable to find ' . MODEL_WSJ_PCFG     unless -e MODEL_WSJ_PCFG;
-    carp 'Unable to find ' . MODEL_WSJ_FACTORED unless -e MODEL_WSJ_FACTORED;
+    croak 'Unable to find ' . PARSER_JAR       unless -e PARSER_JAR;
+    croak 'Unable to find ' . MODEL_EN_PCFG    unless -e MODEL_EN_PCFG;
+    carp 'Unable to find ' . MODEL_EN_FACTORED unless -e MODEL_EN_FACTORED;
+    carp 'Unable to find ' . MODEL_EN_PCFG_WSJ unless -e MODEL_EN_PCFG_WSJ;
+    carp 'Unable to find ' . MODEL_EN_FACTORED_WSJ
+      unless -e MODEL_EN_FACTORED_WSJ;
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -129,11 +130,11 @@ The full path of the 'English PCFG' model data.
 
 The full path of the 'English Factored' model data.
 
-=item MODEL_WSJ_PCFG
+=item MODEL_EN_PCFG_WSJ
 
 The full path of the 'WSJ PCFG' model data.
 
-=item MODEL_WSJ_FACTORED
+=item MODEL_EN_FACTORED_WSJ
 
 The full path of the 'WSJ Factored' model data.
 
