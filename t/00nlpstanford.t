@@ -5,7 +5,8 @@ BEGIN {
     use_ok('NLP::StanfordParser');
 }
 
-is(PARSER_RELEASE_DATE, '2010-11-30', 'The parser is of the right release date');
+is( PARSER_RELEASE_DATE, '2010-11-30',
+    'The parser is of the right release date' );
 
 subtest 'model is PCFG' => sub {
     my $nlp = new_ok('NLP::StanfordParser');
@@ -29,13 +30,37 @@ subtest 'model is FACTORED' => sub {
     has_attribute_ok( $nlp, 'model' );
     is( $nlp->model, MODEL_EN_FACTORED, 'Model is Factored' );
     isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
-
     my $sentence = 'The quick brown fox jumped over the lazy dog!';
     isnt( $nlp->parse($sentence), undef );
-
     done_testing();
 };
 
+subtest 'model is PCFG-WSJ' => sub {
+    my $nlp = new_ok( 'NLP::StanfordParser' => [ model => MODEL_EN_PCFG_WSJ ] );
+    meta_ok($nlp);
+    can_ok( $nlp, 'parse' );
+    has_attribute_ok( $nlp, 'parser' );
+    has_attribute_ok( $nlp, 'model' );
+    is( $nlp->model, MODEL_EN_PCFG_WSJ, 'Model is PCFG-WSJ' );
+    isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
+    my $sentence = 'The quick brown fox jumped over the lazy dog!';
+    isnt( $nlp->parse($sentence), undef );
+    done_testing();
+};
+
+subtest 'model is FACTORED-WSJ' => sub {
+    my $nlp =
+      new_ok( 'NLP::StanfordParser' => [ model => MODEL_EN_FACTORED_WSJ ] );
+    meta_ok($nlp);
+    can_ok( $nlp, 'parse' );
+    has_attribute_ok( $nlp, 'parser' );
+    has_attribute_ok( $nlp, 'model' );
+    is( $nlp->model, MODEL_EN_FACTORED_WSJ, 'Model is Factored-WSJ' );
+    isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
+    my $sentence = 'The quick brown fox jumped over the lazy dog!';
+    isnt( $nlp->parse($sentence), undef );
+    done_testing();
+};
 done_testing();
 __END__
 COPYRIGHT: 2011. Vikas Naresh Kumar.

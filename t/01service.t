@@ -3,9 +3,8 @@ use Test::More;
 BEGIN {
     use_ok('NLP::Service');
 }
-
 can_ok( 'NLP::Service', 'run' );
-
+can_ok( 'NLP::Service', 'load_models' );
 done_testing();
 __END__
 COPYRIGHT: 2011. Vikas Naresh Kumar.
