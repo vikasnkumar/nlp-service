@@ -12,10 +12,21 @@ METHODS
         NLP Engines that are being used are loaded up before the web service
         is ready.
 
-        It takes only 1 argument, that denotes whether the models are lazily
-        loaded or instantly loaded. For example,
+        It takes a hash as an argument with the following keys:
 
-        "NLP::Service::run(load => 1)"
+        force   Forces the loading of all NLP models before doing anything.
+                The value expected is anything that is not 0 or undef, to be
+                able to do this. Example,
+
+                "NLP::Service::run(force => 1);"
+
+        config  Takes in a configuration for the internal service
+                implementation. Currently the implementation is using
+                Dancer, and all of these keys correspond to Dancer::Config.
+                For more details, refer to Dancer config for the acceptable
+                values. Example,
+
+                "NLP::Service::run(config => { logger => 'console' });"
 
     load_models()
         The "load_models()" function creates all the required NLP models

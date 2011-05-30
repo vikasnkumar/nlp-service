@@ -9,11 +9,11 @@ BEGIN {
     use Exporter();
     our @ISA     = qw(Exporter);
     our $VERSION = '0.01';
+    use NLP::StanfordParser;
 }
 
 use Dancer qw(:tests); # we do not want the tests exporting the wrong functions.
 use Dancer::Plugin::REST;
-use NLP::StanfordParser;
 
 my %_nlp = ();
 
@@ -42,6 +42,19 @@ any [qw/get post/] => '/nlp/info.:format' => sub {
     };
 };
 
+#Dancer::forward does not forward the parameters, hence we have to explicitly
+#forward them.
+any [qw/get post/] => '/nlp/parse.:format' => sub {
+    my $route = '/nlp/parse/en_pcfg.' . params->{format};
+    debug "Forwarding to $route";
+    return forward $route,
+      {
+        format => params->{format},
+        model  => 'en_pcfg',
+        data   => params->{data}
+      };
+};
+
 any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
     my $model = params->{model};
     debug "Model is $model";
@@ -60,19 +73,10 @@ any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
     return send_error( { error => "Invalid NLP object for $model" }, 500 );
 };
 
-#Dancer::forward does not forward the parameters, hence we have to explicitly
-#forward them.
-any [qw/get post/] => '/nlp/parse.:format' => sub {
-    my $route = '/nlp/parse/en_pcfg.' . params->{format};
-    debug "Forwarding to $route";
-    return forward $route,
-        { format => params->{format}, model => 'en_pcfg', data => params->{data} };
-};
-
 sub load_models {
     my ( $force, $jarpath ) = @_;
     say 'Forcing loading of all NLP models.' if $force;
-
+    %_nlp = ();
     $_nlp{en_pcfg} = new NLP::StanfordParser( model => MODEL_EN_PCFG )
       or Carp::croak 'Unable to create MODEL_EN_PCFG for NLP::StanfordParser';
 
@@ -102,19 +106,19 @@ sub load_models {
 }
 
 sub run {
-    my %args = @_;
-    my $force = $args{force} if scalar( keys(%args) );
-
-    #TODO: should be able to take a YAML file that can convert to a
-    #Dancer::Config object and use that. should also add logging statements.
-    set log         => 'debug';
-    set logger      => 'console';
-    set show_errors => 1;
-
+    my %args   = @_;
+    my $force  = $args{force} if scalar( keys(%args) );
+    my $config = $args{config} if scalar( keys(%args) );
+    if ( defined $config and ref $config eq 'HASH' ) {
+        map { set( $_ => $config->{$_} ) } keys %$config;
+    } else {
+        set log          => 'error';
+        set logger       => 'console';
+        set show_errors  => 1;
+        set startup_info => 0;
+    }
     load_models($force);
-
-    # dancer's invocation
-    dance;
+    dance;    # invoke Dancer
 }
 
 1;
@@ -142,10 +146,27 @@ NLP::Service is a RESTful web service based off Dancer to provide natural langua
 The C<run()> function starts up the NLP::Service, and listens to requests. It currently takes no parameters.
 It makes sure that the NLP Engines that are being used are loaded up before the web service is ready.
 
-It takes only 1 argument, that denotes whether the models are lazily loaded or
-instantly loaded. For example,
+It takes a hash as an argument with the following keys:
 
-C<NLP::Service::run(load =E<gt> 1)>
+=over 8
+
+=item B<force>
+
+Forces the loading of all NLP models before doing anything. The value expected
+is anything that is not 0 or undef, to be able to do this. Example,
+
+C<NLP::Service::run(force =E<gt> 1);>
+
+=item B<config>
+
+Takes in a configuration for the internal service implementation.
+Currently the implementation is using Dancer, and all of these keys correspond
+to Dancer::Config. For more details, refer to Dancer config for the acceptable
+values. Example,
+
+C<NLP::Service::run(config =E<gt> { logger =E<gt> 'console' });>
+
+=back
 
 =item B<load_models()>
 
