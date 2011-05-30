@@ -59,14 +59,17 @@ RESTful API
         supported models are returned by the GET request to
         "/nlp/models.(json|xml|yml)" URI.
 
+        The return value is a Part of Speech tagged variation of the input
+        parameter *data*.
+
         The parameters needed are as follows:
 
-        text
-          One of the parameters expected is *text* which should contain the
-          text that needs to be parsed and whose NLP formation needs to be
-          returned.
+        data
+          One of the parameters expected is *data* which should contain the
+          text that needs to be parsed and whose NLP formation of
+          Part-of-Speech tagging needs to be returned.
 
-    GET/POST */nlp/parse/default.(json|xml|yml)*
+    GET/POST */nlp/parse.(json|xml|yml)*
         This performs the same function as above, but picks the default
         model which is "en_pcfg". It expects the same parameters as above.
 

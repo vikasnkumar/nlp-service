@@ -27,9 +27,9 @@ my $build = Module::Build->new(
         'Carp'                 => 0,
         'namespace::autoclean' => 0,
         'Moose'                => 0,
-        'Inline::Java'         => 0,
-        'Dancer'               => 0,
-        'Dancer::Plugin::REST' => 0,
+        'Inline::Java'         => '0.53',
+        'Dancer'               => '1.3051',
+        'Dancer::Plugin::REST' => '0.06',
     },
     build_requires => {
         'Test::More'  => 0,

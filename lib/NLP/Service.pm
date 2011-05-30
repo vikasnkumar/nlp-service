@@ -19,21 +19,21 @@ my %_nlp = ();
 
 prepare_serializer_for_format;
 
-get '/' => sub {
+any [qw/get post/] => '/' => sub {
 
     #TODO: show a UI form based thing for easy use for the end user.
     return 'This is ' . config->{appname} . "\n";
 };
 
-get '/nlp/models.:format' => sub {
+any [qw/get post/] => '/nlp/models.:format' => sub {
     return [ keys %_nlp ];
 };
 
-get '/nlp/languages.:format' => sub {
+any [qw/get post/] => '/nlp/languages.:format' => sub {
     return [qw/en/];
 };
 
-get '/nlp/info.:format' => sub {
+any [qw/get post/] => '/nlp/info.:format' => sub {
     return {
         version        => $NLP::Service::VERSION,
         nlplib_name    => 'Stanford Parser',
@@ -42,28 +42,34 @@ get '/nlp/info.:format' => sub {
     };
 };
 
-any [qw/get post/] => '/nlp/parse/default.:format' => sub {
-    my $model = 'en_pcfg';
-    return send_error( { error => "Unknown parsing model $model" }, 500 )
-      unless defined $_nlp{$model};
-    my $txt = params->{text};
-    return send_error( { error => "Empty 'text' parameter" }, 500 )
-      unless defined $txt;
-    return $_nlp{$model}->parse($txt) . "\n";
-};
-
 any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
     my $model = params->{model};
+    debug "Model is $model";
     return send_error( { error => "Unknown parsing model $model" }, 500 )
       unless defined $_nlp{$model};
-    my $txt = params->{text};
-    return send_error( { error => "Empty 'text' parameter" }, 500 )
-      unless defined $txt;
-    return $_nlp{$model}->parse($txt) . "\n";
+    my $data = params->{data};
+    $data =~ s/^\s+//g;
+    $data =~ s/\s+$//g;
+    my $data = params->{data}
+      or return send_error( { error => "Empty 'data' parameter" }, 500 );
+    debug "Data is $data\n";
+
+    if ( defined $_nlp{$model} ) {
+        return $_nlp{$model}->parse($data) . "\n";
+    }
+    return send_error( { error => "Invalid NLP object for $model" }, 500 );
+};
+
+#Dancer::forward does not forward the parameters, hence we have to explicitly
+#forward them.
+any [qw/get post/] => '/nlp/parse.:format' => sub {
+    my $format = params->{format};
+    return forward "/nlp/parse/en_pcfg.$format",
+      { model => 'en_pcfg', data => params->{data} };
 };
 
 sub load_models {
-    my ($force) = shift;
+    my ( $force, $jarpath ) = @_;
     say 'Forcing loading of all NLP models.' if $force;
 
     $_nlp{en_pcfg} = new NLP::StanfordParser( model => MODEL_EN_PCFG )
@@ -187,18 +193,22 @@ or their programs. The C<$model> corresponds to one of the available models such
 as "en_pcfg", "en_factored", etc. The list of supported models are returned by
 the GET request to C</nlp/models.(json|xml|yml)> URI.
 
+The return value is a Part of Speech tagged variation of the input parameter
+I<data>.
+
 The parameters needed are as follows:
 
 =over 2
 
-=item B<text>
+=item B<data>
 
-One of the parameters expected is I<text> which should contain the text that
-needs to be parsed and whose NLP formation needs to be returned.
+One of the parameters expected is I<data> which should contain the text that
+needs to be parsed and whose NLP formation of Part-of-Speech tagging needs to
+be returned.
 
 =back
 
-=item B<GET/POST> I</nlp/parse/default.(json|xml|yml)>
+=item B<GET/POST> I</nlp/parse.(json|xml|yml)>
 
 This performs the same function as above, but picks the default model which is
 C<en_pcfg>. It expects the same parameters as above.
