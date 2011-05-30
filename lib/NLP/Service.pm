@@ -45,14 +45,32 @@ any [qw/get post/] => '/nlp/info.:format' => sub {
 #Dancer::forward does not forward the parameters, hence we have to explicitly
 #forward them.
 any [qw/get post/] => '/nlp/parse.:format' => sub {
-    my $route = '/nlp/parse/en_pcfg.' . params->{format};
+    my $model = 'en_pcfg';
+    my $route = "/nlp/parse/$model." . params->{format};
     debug "Forwarding to $route";
-    return forward $route,
-      {
-        format => params->{format},
-        model  => 'en_pcfg',
-        data   => params->{data}
-      };
+    if ( request->{method} eq 'GET' ) {
+        return forward $route,
+          {
+            format => params->{format},
+            model  => $model,
+            data   => params->{data}
+          };
+    } else {
+
+        # HACK inserted until Dancer's forwarding bug gets fixed.
+        # https://github.com/sukria/Dancer/pull/545
+        #
+        my $data = params->{data};
+        $data =~ s/^\s+//g;
+        $data =~ s/\s+$//g;
+        my $data = params->{data}
+          or return send_error( { error => "Empty 'data' parameter" }, 500 );
+        debug "Data is $data\n";
+        if ( defined $_nlp{$model} ) {
+            return $_nlp{$model}->parse($data) . "\n";
+        }
+        return send_error( { error => "Invalid NLP object for $model" }, 500 );
+    }
 };
 
 any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
