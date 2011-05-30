@@ -15,7 +15,7 @@ my %nlpjava = map { "$nlppath/" . $_ => "lib/NLP/StanfordParser/$_" } @nlpfiles;
 
 my $build = Module::Build->new(
     module_name    => 'NLP::Service',
-    dist_name      => 'nlp-service',
+    dist_name      => 'NLP-Service',
     dist_author    => 'Vikas Naresh Kumar <vikas@cpan.org>',
     dist_abstract  => 'A RESTful NLP Service',
     license        => 'perl',
