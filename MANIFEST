@@ -11,6 +11,7 @@ MANIFEST			This list of files
 META.yml
 README
 script/nlpservice
+script/test.PL
 t/00nlpstanford.t
 t/01service.t
 t/02rest.t

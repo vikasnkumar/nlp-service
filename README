@@ -12,10 +12,21 @@ METHODS
         NLP Engines that are being used are loaded up before the web service
         is ready.
 
-        It takes only 1 argument, that denotes whether the models are lazily
-        loaded or instantly loaded. For example,
+        It takes a hash as an argument with the following keys:
 
-        "NLP::Service::run(load => 1)"
+        force   Forces the loading of all NLP models before doing anything.
+                The value expected is anything that is not 0 or undef, to be
+                able to do this. Example,
+
+                "NLP::Service::run(force => 1);"
+
+        config  Takes in a configuration for the internal service
+                implementation. Currently the implementation is using
+                Dancer, and all of these keys correspond to Dancer::Config.
+                For more details, refer to Dancer config for the acceptable
+                values. Example,
+
+                "NLP::Service::run(config => { logger => 'console' });"
 
     load_models()
         The "load_models()" function creates all the required NLP models
@@ -59,14 +70,17 @@ RESTful API
         supported models are returned by the GET request to
         "/nlp/models.(json|xml|yml)" URI.
 
+        The return value is a Part of Speech tagged variation of the input
+        parameter *data*.
+
         The parameters needed are as follows:
 
-        text
-          One of the parameters expected is *text* which should contain the
-          text that needs to be parsed and whose NLP formation needs to be
-          returned.
+        data
+          One of the parameters expected is *data* which should contain the
+          text that needs to be parsed and whose NLP formation of
+          Part-of-Speech tagging needs to be returned.
 
-    GET/POST */nlp/parse/default.(json|xml|yml)*
+    GET/POST */nlp/parse.(json|xml|yml)*
         This performs the same function as above, but picks the default
         model which is "en_pcfg". It expects the same parameters as above.
 
