@@ -63,9 +63,10 @@ any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
 #Dancer::forward does not forward the parameters, hence we have to explicitly
 #forward them.
 any [qw/get post/] => '/nlp/parse.:format' => sub {
-    my $format = params->{format};
-    return forward "/nlp/parse/en_pcfg.$format",
-      { model => 'en_pcfg', data => params->{data} };
+    my $route = '/nlp/parse/en_pcfg.' . params->{format};
+    debug "Forwarding to $route";
+    return forward $route,
+        { format => params->{format}, model => 'en_pcfg', data => params->{data} };
 };
 
 sub load_models {
