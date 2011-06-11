@@ -60,6 +60,17 @@ use Inline (
 			GrammaticalStructure gs = gsf.newGrammaticalStructure(parser.getBestParse());
 			return gs.typedDependenciesCollapsed().toString();
 		}
+        public static String types() {
+            StringBuilder buf = new StringBuilder("{\n");
+            List<GrammaticalRelation> list =
+                                        EnglishGrammaticalRelations.values();
+            for (GrammaticalRelation rel : list) {
+                buf.append("   ").append(rel.getShortName()).append("    =>    '").
+                    append(rel.getLongName()).append("',\n");
+            }
+            buf.append("}\n");
+            return buf.toString();
+        }
 		public String parseold(String sentence) {
 			parser.parse(sentence);
 			return parser.getBestParse().toString();
@@ -98,6 +109,20 @@ before '_build_parser' => sub {
     Carp::carp 'Unable to find ' . MODEL_EN_FACTORED_WSJ
       unless -e MODEL_EN_FACTORED_WSJ;
 };
+
+has types => (
+    is => 'ro',
+    lazy_build => 1,
+    isa => 'HashRef[Str]',
+);
+
+sub _build_types {
+    my ($self) = @_;
+    my $str = NLP::StanfordParser::Java->types();
+    return {} unless (defined $str and length $str);
+    my $href = eval $str;
+    return $href;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;

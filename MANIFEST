@@ -15,3 +15,4 @@ script/test.PL
 t/00nlpstanford.t
 t/01service.t
 t/02rest.t
+t/03stanfordjava.t
