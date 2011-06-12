@@ -11,7 +11,7 @@ print $resp->as_string, "\n";
 my $resp = $lwp->get($url);
 print $resp->as_string, "\n";
 
-my %form = ( data => 'This is not a box.', );
+my %form = ( data => 'This is not a box. Then what is it ?', );
 $url = "http://localhost:3000/nlp/parse/en_pcfg.yml";
 $resp = $lwp->post( $url, \%form );
 print $resp->as_string, "\n";
@@ -19,6 +19,7 @@ my $get_params = "$url?data=" . uri_escape( $form{data} );
 $resp = $lwp->get($get_params);
 print $resp->as_string, "\n";
 
+%form = ( data => 'Then what is it ?', );
 $url        = "http://localhost:3000/nlp/parse.yml";
 $get_params = "$url?data=" . uri_escape( $form{data} );
 $resp       = $lwp->get($get_params);

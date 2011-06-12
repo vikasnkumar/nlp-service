@@ -54,11 +54,18 @@ use Inline (
 		}
 		public String parse(String sentence) {
 			parser.parse(sentence);
-//			Tree tree = (Tree)parser.apply(sentence);
-//			TreePrint trpr = new TreePrint("penn,typedDependenciesCollapsed");
-//			trpr.printTree(tree);
 			GrammaticalStructure gs = gsf.newGrammaticalStructure(parser.getBestParse());
-			return gs.typedDependenciesCollapsed().toString();
+            Collection <TypedDependency> collxn =
+                                gs.typedDependenciesCollapsed();
+            StringBuilder buf = new StringBuilder("[\n");
+            for (TypedDependency td : collxn) {
+                buf.append("{ relation => '").
+                    append(td.reln().getLongName()).append("', from => '").
+                    append(td.gov()).append("', to => '").
+                    append(td.dep()).append("' },\n");
+            }
+            buf.append("]\n");
+            return buf.toString();
 		}
         public static String types() {
             StringBuilder buf = new StringBuilder("{\n");
@@ -92,7 +99,6 @@ has model => (
 has parser => (
     is         => 'ro',
     lazy_build => 1,
-    handles    => [qw/parse/],
     isa        => 'NLP::StanfordParser::Java',
 );
 
@@ -114,14 +120,27 @@ has types => (
     is => 'ro',
     lazy_build => 1,
     isa => 'HashRef[Str]',
+    init_arg => undef,
 );
 
 sub _build_types {
     my ($self) = @_;
     my $str = NLP::StanfordParser::Java->types();
     return {} unless (defined $str and length $str);
-    my $href = eval $str;
+    my $href = eval $str or Carp::carp 'Unable to evaluate result for types';
+    return $str unless defined $href;
     return $href;
+}
+
+sub parse {
+    my ($self, $sentence) = @_;
+    return unless defined $sentence;
+    my $str = $self->parser->parse($sentence);
+    return unless (defined $str and length $str);
+    return $str;
+# FIXME: this breaks all tests
+#    my $aref = eval $str or Carp::carp 'Unable to evaluate result from parse';
+#    return defined $aref ? $aref : $str;
 }
 
 __PACKAGE__->meta->make_immutable;
