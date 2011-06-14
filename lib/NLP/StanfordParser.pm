@@ -67,7 +67,7 @@ use Inline (
             buf.append("]\n");
             return buf.toString();
 		}
-        public static String types() {
+        public static String relations() {
             StringBuilder buf = new StringBuilder("{\n");
             List<GrammaticalRelation> list =
                                         EnglishGrammaticalRelations.values();
@@ -116,18 +116,10 @@ before '_build_parser' => sub {
       unless -e MODEL_EN_FACTORED_WSJ;
 };
 
-has types => (
-    is => 'ro',
-    lazy_build => 1,
-    isa => 'HashRef[Str]',
-    init_arg => undef,
-);
-
-sub _build_types {
-    my ($self) = @_;
-    my $str = NLP::StanfordParser::Java->types();
+sub relations {
+    my $str = NLP::StanfordParser::Java->relations();
     return {} unless (defined $str and length $str);
-    my $href = eval $str or Carp::carp 'Unable to evaluate result for types';
+    my $href = eval $str or Carp::carp 'Unable to evaluate result for relations';
     return $str unless defined $href;
     return $href;
 }
@@ -138,9 +130,6 @@ sub parse {
     my $str = $self->parser->parse($sentence);
     return unless (defined $str and length $str);
     return $str;
-# FIXME: this breaks all tests
-#    my $aref = eval $str or Carp::carp 'Unable to evaluate result from parse';
-#    return defined $aref ? $aref : $str;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -209,6 +198,10 @@ The default model is MODEL_EN_PCFG.
 
 The actual parser object. This has a few methods that are exposed externally to
 the actual class, most notably the I<parse()> method.
+
+=item B<relations>
+
+The list of grammatical relations supported by the Stanford Parser library.
 
 =back
 

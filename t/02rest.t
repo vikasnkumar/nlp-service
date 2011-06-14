@@ -1,5 +1,5 @@
 use Test::More;
-
+use YAML;
 BEGIN {
     use_ok('NLP::Service');
 }
@@ -20,6 +20,7 @@ subtest 'GET/POST routes that should pass' => sub {
         '/nlp/info'      => \@ser,
         '/nlp/models'    => \@ser,
         '/nlp/languages' => \@ser,
+        '/nlp/relations' => \@ser,
     );
     my %modelroutes = (
         '/nlp/parse'                => \@ser,
@@ -106,8 +107,8 @@ subtest 'parse text using GET/POST' => sub {
         is( $res->{status}, $code, "$meth $rte responds with $code" );
         my $content = $res->{content} or fail("No content received");
         if ( $code eq 200 ) {
-            $content = eval $content;
-            is_deeply( $content, $output,
+            my $aref = YAML::Load($content) or eval $content;
+            is_deeply( $aref, $output,
                 "Response content looks good for $meth $rte" );
         } elsif ( $code eq 500 ) {
             like( $content, qr/error/, "Error: $content" );

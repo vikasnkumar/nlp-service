@@ -63,6 +63,10 @@ RESTful API
     GET */nlp/info.(json|xml|yml)*
         Returns a hashref of details about the NLP tool being used.
 
+    GET/POST */nlp/relations.(json|xml|yml)*
+        The user can get a list of all the english grammatical relations
+        supported by the NLP backend.
+
     GET/POST */nlp/parse/$model.(json|xml|yml)*
         The user can make GET or POST requests to the above URI constructed
         by the user or their programs. The $model corresponds to one of the

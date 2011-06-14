@@ -8,7 +8,13 @@ my $lwp = new LWP::UserAgent;
 my $url  = "http://localhost:3000/";
 my $resp = $lwp->post($url);
 print $resp->as_string, "\n";
-my $resp = $lwp->get($url);
+$resp = $lwp->get($url);
+print $resp->as_string, "\n";
+
+$url = "http://localhost:3000/nlp/relations.yml";
+$resp = $lwp->post($url);
+print $resp->as_string, "\n";
+$resp = $lwp->get($url);
 print $resp->as_string, "\n";
 
 my %form = ( data => 'This is not a box. Then what is it ?', );
