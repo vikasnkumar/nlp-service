@@ -42,6 +42,10 @@ any [qw/get post/] => '/nlp/info.:format' => sub {
     };
 };
 
+any [qw/get post/] => '/nlp/relations.:format' => sub {
+    return NLP::StanfordParser::relations();
+};
+
 #Dancer::forward does not forward the parameters, hence we have to explicitly
 #forward them.
 any [qw/get post/] => '/nlp/parse.:format' => sub {
@@ -67,7 +71,9 @@ any [qw/get post/] => '/nlp/parse.:format' => sub {
           or return send_error( { error => "Empty 'data' parameter" }, 500 );
         debug "Data is $data\n";
         if ( defined $_nlp{$model} ) {
-            return $_nlp{$model}->parse($data) . "\n";
+            my $str = $_nlp{$model}->parse($data);
+            my $aref = eval $str or Carp::carp "Unable to eval $str";
+            return defined $aref ? $aref : "$str\n";
         }
         return send_error( { error => "Invalid NLP object for $model" }, 500 );
     }
@@ -86,7 +92,9 @@ any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
     debug "Data is $data\n";
 
     if ( defined $_nlp{$model} ) {
-        return $_nlp{$model}->parse($data) . "\n";
+        my $str = $_nlp{$model}->parse($data);
+        my $aref = eval $str or Carp::carp "Unable to eval $str";
+        return defined $aref ? $aref : "$str\n";
     }
     return send_error( { error => "Invalid NLP object for $model" }, 500 );
 };
@@ -225,6 +233,11 @@ Returns an array of supported languages. Default is "en" for English.
 =item B<GET> I</nlp/info.(json|xml|yml)>
 
 Returns a hashref of details about the NLP tool being used.
+
+=item B<GET/POST> I</nlp/relations.(json|xml|yml)>
+
+The user can get a list of all the english grammatical relations supported by
+the NLP backend.
 
 =item B<GET/POST> I</nlp/parse/B<$model>.(json|xml|yml)>
 

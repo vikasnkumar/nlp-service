@@ -1,5 +1,5 @@
 use Test::More;
-
+use YAML;
 BEGIN {
     use_ok('NLP::Service');
 }
@@ -20,6 +20,7 @@ subtest 'GET/POST routes that should pass' => sub {
         '/nlp/info'      => \@ser,
         '/nlp/models'    => \@ser,
         '/nlp/languages' => \@ser,
+        '/nlp/relations' => \@ser,
     );
     my %modelroutes = (
         '/nlp/parse'                => \@ser,
@@ -86,10 +87,15 @@ subtest 'parse text using GET/POST' => sub {
       /nlp/parse/en_factoredwsj.yml
     );
     my $params = { data => 'The quick brown fox jumped over a lazy dog.', };
-    my $output = qq/[det(fox-4, The-1), amod(fox-4, quick-2), amod(fox-4,
-    brown-3), nsubj(jumped-5, fox-4), det(dog-9, a-7), amod(dog-9, lazy-8),
-    prep_over(jumped-5, dog-9)]/;
-    $output =~ tr/\040\012//ds;
+    my $output = eval qq/[
+    { relation => 'determiner', from => 'fox-4', to => 'The-1' },
+    { relation => 'adjectival modifier', from => 'fox-4', to => 'quick-2' },
+    { relation => 'adjectival modifier', from => 'fox-4', to => 'brown-3' },
+    { relation => 'nominal subject', from => 'jumped-5', to => 'fox-4' },
+    { relation => 'determiner', from => 'dog-9', to => 'a-7' },
+    { relation => 'adjectival modifier', from => 'dog-9', to => 'lazy-8' },
+    { relation => 'prep_collapsed', from => 'jumped-5', to => 'dog-9' },
+    ]/;
     my $check_request = sub {
         my ( $meth, $rte, $code ) = @_;
         Carp::croak 'Invalid method' unless defined $meth;
@@ -101,8 +107,8 @@ subtest 'parse text using GET/POST' => sub {
         is( $res->{status}, $code, "$meth $rte responds with $code" );
         my $content = $res->{content} or fail("No content received");
         if ( $code eq 200 ) {
-            $content =~ tr/\040\012//ds;
-            is( $content, $output,
+            my $aref = YAML::Load($content) or eval $content;
+            is_deeply( $aref, $output,
                 "Response content looks good for $meth $rte" );
         } elsif ( $code eq 500 ) {
             like( $content, qr/error/, "Error: $content" );

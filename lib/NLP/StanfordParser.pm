@@ -54,12 +54,30 @@ use Inline (
 		}
 		public String parse(String sentence) {
 			parser.parse(sentence);
-//			Tree tree = (Tree)parser.apply(sentence);
-//			TreePrint trpr = new TreePrint("penn,typedDependenciesCollapsed");
-//			trpr.printTree(tree);
 			GrammaticalStructure gs = gsf.newGrammaticalStructure(parser.getBestParse());
-			return gs.typedDependenciesCollapsed().toString();
+            Collection <TypedDependency> collxn =
+                                gs.typedDependenciesCollapsed();
+            StringBuilder buf = new StringBuilder("[\n");
+            for (TypedDependency td : collxn) {
+                buf.append("{ relation => '").
+                    append(td.reln().getLongName()).append("', from => '").
+                    append(td.gov()).append("', to => '").
+                    append(td.dep()).append("' },\n");
+            }
+            buf.append("]\n");
+            return buf.toString();
 		}
+        public static String relations() {
+            StringBuilder buf = new StringBuilder("{\n");
+            List<GrammaticalRelation> list =
+                                        EnglishGrammaticalRelations.values();
+            for (GrammaticalRelation rel : list) {
+                buf.append("   ").append(rel.getShortName()).append("    =>    '").
+                    append(rel.getLongName()).append("',\n");
+            }
+            buf.append("}\n");
+            return buf.toString();
+        }
 		public String parseold(String sentence) {
 			parser.parse(sentence);
 			return parser.getBestParse().toString();
@@ -81,7 +99,6 @@ has model => (
 has parser => (
     is         => 'ro',
     lazy_build => 1,
-    handles    => [qw/parse/],
     isa        => 'NLP::StanfordParser::Java',
 );
 
@@ -98,6 +115,22 @@ before '_build_parser' => sub {
     Carp::carp 'Unable to find ' . MODEL_EN_FACTORED_WSJ
       unless -e MODEL_EN_FACTORED_WSJ;
 };
+
+sub relations {
+    my $str = NLP::StanfordParser::Java->relations();
+    return {} unless (defined $str and length $str);
+    my $href = eval $str or Carp::carp 'Unable to evaluate result for relations';
+    return $str unless defined $href;
+    return $href;
+}
+
+sub parse {
+    my ($self, $sentence) = @_;
+    return unless defined $sentence;
+    my $str = $self->parser->parse($sentence);
+    return unless (defined $str and length $str);
+    return $str;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -165,6 +198,10 @@ The default model is MODEL_EN_PCFG.
 
 The actual parser object. This has a few methods that are exposed externally to
 the actual class, most notably the I<parse()> method.
+
+=item B<relations>
+
+The list of grammatical relations supported by the Stanford Parser library.
 
 =back
 

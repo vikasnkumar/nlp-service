@@ -40,6 +40,7 @@ my $build = Module::Build->new(
         'Dancer::Test' => 0,
         'LWP::UserAgent' => 0,
         'URI::Escape'  => 0,
+        'YAML'    => 0,
     },
     script_files => qw( script/nlpservice ),
     install_path => { java => 'lib/NLP/StanfordParser/', },

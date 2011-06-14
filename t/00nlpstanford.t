@@ -17,7 +17,7 @@ subtest 'model is PCFG' => sub {
     is( $nlp->model, MODEL_EN_PCFG, 'Model is PCFG' );
     isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
     my $sentence = 'The quick brown fox jumped over the lazy dog!';
-    isnt( $nlp->parse($sentence), undef );
+    isnt( $nlp->parse($sentence), undef, 'sentence gets parsed' );
 
     done_testing();
 };
@@ -31,7 +31,7 @@ subtest 'model is FACTORED' => sub {
     is( $nlp->model, MODEL_EN_FACTORED, 'Model is Factored' );
     isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
     my $sentence = 'The quick brown fox jumped over the lazy dog!';
-    isnt( $nlp->parse($sentence), undef );
+    isnt( $nlp->parse($sentence), undef, 'sentence gets parsed' );
     done_testing();
 };
 
@@ -44,7 +44,7 @@ subtest 'model is PCFG-WSJ' => sub {
     is( $nlp->model, MODEL_EN_PCFG_WSJ, 'Model is PCFG-WSJ' );
     isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
     my $sentence = 'The quick brown fox jumped over the lazy dog!';
-    isnt( $nlp->parse($sentence), undef );
+    isnt( $nlp->parse($sentence), undef, 'sentence gets parsed' );
     done_testing();
 };
 
@@ -58,7 +58,7 @@ subtest 'model is FACTORED-WSJ' => sub {
     is( $nlp->model, MODEL_EN_FACTORED_WSJ, 'Model is Factored-WSJ' );
     isa_ok( $nlp->parser, 'NLP::StanfordParser::Java' );
     my $sentence = 'The quick brown fox jumped over the lazy dog!';
-    isnt( $nlp->parse($sentence), undef );
+    isnt( $nlp->parse($sentence), undef, 'sentence gets parsed' );
     done_testing();
 };
 done_testing();
