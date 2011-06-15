@@ -5,6 +5,9 @@ SYNOPSIS
     NLP::Service is a RESTful web service based off Dancer to provide
     natural language parsing for English.
 
+VERSION
+    0.02
+
 METHODS
     run()
         The "run()" function starts up the NLP::Service, and listens to

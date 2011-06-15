@@ -8,7 +8,7 @@ use Carp ();
 BEGIN {
     use Exporter();
     our @ISA     = qw(Exporter);
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     use NLP::StanfordParser;
 }
 
@@ -162,6 +162,10 @@ NLP::Service
 =head1 SYNOPSIS
 
 NLP::Service is a RESTful web service based off Dancer to provide natural language parsing for English.
+
+=head1 VERSION
+
+0.02
 
 =head1 METHODS
 
