@@ -8,7 +8,7 @@ use Carp ();
 BEGIN {
     use Exporter();
     our @ISA     = qw(Exporter);
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
 
     # extract the path from the Package
     my $package = __PACKAGE__ . '.pm';
@@ -150,6 +150,10 @@ NLP::StanfordParser
 
 NLP::StanfordParser is a Java wrapper around Stanford's NLP libraries and data
 files.
+
+=head1 VERSION
+
+0.02
 
 =head1 EXPORTED CONSTANTS
 
