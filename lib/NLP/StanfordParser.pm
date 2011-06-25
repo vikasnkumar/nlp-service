@@ -54,15 +54,16 @@ use Inline (
 		}
 		public String parse(String sentence) {
 			parser.parse(sentence);
-			GrammaticalStructure gs = gsf.newGrammaticalStructure(parser.getBestParse());
+			GrammaticalStructure gs = gsf.newGrammaticalStructure(
+                                            parser.getBestParse());
             Collection <TypedDependency> collxn =
                                 gs.typedDependenciesCollapsed();
             StringBuilder buf = new StringBuilder("[\n");
             for (TypedDependency td : collxn) {
-                buf.append("{ relation => '").
-                    append(td.reln().getLongName()).append("', from => '").
-                    append(td.gov()).append("', to => '").
-                    append(td.dep()).append("' },\n");
+                buf.append("{ relation => qq/").
+                    append(td.reln().getLongName()).append("/, from => qq/").
+                    append(td.gov()).append("/, to => qq/").
+                    append(td.dep()).append("/ },\n");
             }
             buf.append("]\n");
             return buf.toString();
@@ -72,8 +73,9 @@ use Inline (
             List<GrammaticalRelation> list =
                                         EnglishGrammaticalRelations.values();
             for (GrammaticalRelation rel : list) {
-                buf.append("   ").append(rel.getShortName()).append("    =>    '").
-                    append(rel.getLongName()).append("',\n");
+                buf.append("   ").append(rel.getShortName()).
+                    append("    => qq/").append(rel.getLongName()).
+                    append("/,\n");
             }
             buf.append("}\n");
             return buf.toString();

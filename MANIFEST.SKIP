@@ -77,3 +77,4 @@
 \blogs
 # Avoid archives of this distribution
 \bNLP-StanfordParser-[\d\.\_]+
+\bNLP-Service-[\d\.\_]+
