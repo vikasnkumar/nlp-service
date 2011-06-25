@@ -84,11 +84,10 @@ any [qw/get post/] => '/nlp/parse/:model.:format' => sub {
     debug "Model is $model";
     return send_error( { error => "Unknown parsing model $model" }, 500 )
       unless defined $_nlp{$model};
-    my $data = params->{data};
-    $data =~ s/^\s+//g;
-    $data =~ s/\s+$//g;
     my $data = params->{data}
       or return send_error( { error => "Empty 'data' parameter" }, 500 );
+    $data =~ s/^\s+//g;
+    $data =~ s/\s+$//g;
     debug "Data is $data\n";
 
     if ( defined $_nlp{$model} ) {
